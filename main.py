@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String,Boolean
 from forms import SearchForm, AddForm, UpdatePriceForm
+import psycopg
 
 #LOAD ENV VARIABLES
 load_dotenv()
