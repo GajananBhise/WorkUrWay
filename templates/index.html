@@ -1,0 +1,21 @@
+{% include "header.html" %}
+
+
+<section class="website hero">
+    <div class="container col-xxl-8 px-4 py-5">
+        <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+            <div class="col-10 col-sm-8 col-lg-6"><img src="{{ url_for('static', filename='/images/bg.jpg') }}"
+                                                       class="d-block mx-lg-auto img-fluid border rounded-4 shadow"
+                                                       alt="cafe image" width="700" height="500" loading="lazy"></div>
+            <div class="col-lg-6"><h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Work ur Way</h1>
+                <p class="lead">Explore nearby cafe where you can work from. find out amenities, facilities they
+                    provide.
+                    you can also add newly opened, so that other people can explore and much more. </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include "cafe_cards.html" %}
+
+{% include "footer.html" %}

@@ -1,0 +1,41 @@
+<section class="cafe cards">
+    <div class="container px-4 py-5" id="cafe-cards">
+        <h2 class="pb-2 border-bottom">Find your Cafe</h2>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 py-5">
+            {% for cafe in cafes: %}
+            <div class="col">
+                <div class="card-wrapper h-100">
+                    <a href="{{ url_for('show_cafe', cafe_id = cafe.id) }}"  style="text-decoration: none; color: inherit;">
+                        <div class="card h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg d-flex flex-column"
+                             style="height: 420px; background-image: url({{ cafe.img_url }});
+                      background-size: cover; background-position: center; background-repeat: no-repeat;">
+
+                            <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1"
+                                 style="background-color: rgba(0, 0, 0, 0.5);">
+                                <div class="flex-grow-1 d-flex flex-column justify-content-end">
+                                    <h3 class="mb-4 display-6 lh-1 fw-bold">{{ cafe.name }}</h3>
+                                </div>
+
+                                <ul class="d-flex list-unstyled mt-auto">
+                                    <li class="d-flex align-items-center me-3">
+                                        <img src="{{ url_for('static', filename='/images/location_icon.png') }}" alt="location" width="20"
+                                             height="20" class="me-2">
+                                        <small>{{ cafe.location }}</small>
+                                    </li>
+                                    <li class="d-flex align-items-center">
+                                        <img src="{{ url_for('static', filename='/images/chair.png') }}" alt="seats" width="20" height="20"
+                                             class="me-2">
+                                        <small>{{ cafe.seats }}</small>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
