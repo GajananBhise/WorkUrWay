@@ -1,6 +1,8 @@
 # WorkUrWay
 
-**WorkUrWay** is a Flask-based web application designed to help users discover and manage information about cafes, including amenities like Wi-Fi, power sockets, and more.
+**WorkUrWay** is a Flask-based web application designed to help users discover and manage information about cafes, including amenities like Wi-Fi, power sockets,
+and after signup and login users can explore the menu at the cafes, add to cart and order online.
+
 
 ## Features
 
@@ -8,6 +10,10 @@
 * Add new cafes to the database through a user-friendly form.
 * Edit existing cafe information, including updating coffee prices.
 * Responsive design using Bootstrap 5.
+* User registration and login.
+* Menu items at the cafes.
+* Users can add to cart their items and order online.
+* Users get order confirmation through Email notification.
 
 ## Technologies Used
 
@@ -49,6 +55,8 @@
    FLASK_ENV=development
    SECRET_KEY=your_secret_key
    SQLALCHEMY_DATABASE_URI=sqlite:///cafes.db
+   EMAIL=your Email address
+   GMAIL_APP_PASSWORD= your gmail app password    
    ```
 
 5. **Run the application:**
@@ -62,20 +70,23 @@
 ## Project Structure
 
 ```
-WorkUrWay/
-├── static/
-│   └── images/
+cafe-order-app/
 ├── templates/
-│   ├── header.html
-│   ├── footer.html
 │   ├── index.html
-│   ├── search.html
-│   └── edit_price.html
+│   ├── login.html
+│   ├── register.html
+│   ├── show_cafe.html
+│   ├── menu.html
+│   ├── add.html
+│   ├── update_price.html
+│   ├── check_out.html
+│   ├── confirm_order.html
+│   └── header.html / footer.html
 ├── forms.py
-├── main.py
+├── app.py
+├── .env
 ├── requirements.txt
-├── Procfile
-└── .gitignore
+└── README.md
 ```
 
 ## Contributing

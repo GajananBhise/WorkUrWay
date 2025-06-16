@@ -17,11 +17,19 @@
             </a>
 
             <ul class="nav nav-pills">
-                <li class="nav-item"><a href="{{ url_for('show_all_cafes') }}" class="nav-link  " aria-current="page">Home</a></li>
-                <li class="nav-item"><a href="{{ url_for('search_by_location') }}" class="nav-link  ">Search Cafe</a></li>
+                <li class="nav-item"><a href="{{ url_for('show_all_cafes') }}" class="nav-link  " aria-current="page">Home</a>
+                </li>
+                <li class="nav-item"><a href="{{ url_for('search_by_location') }}" class="nav-link  ">Search Cafe</a>
+                </li>
                 <li class="nav-item"><a href="{{ url_for('get_random_cafe') }}" class="nav-link  ">Random Cafe</a></li>
                 <li class="nav-item"><a href="{{ url_for('add_cafe') }}" class="nav-link  ">Add Cafe</a></li>
-
+                {% if not current_user.is_authenticated: %}
+                <li class="nav-item"><a href="{{ url_for('register') }}" class="nav-link  ">Register</a></li>
+                <li class="nav-item"><a href="{{ url_for('login') }}" class="nav-link  ">Login</a></li>
+                {% else: %}
+                <li class="nav-item"><a href="{{ url_for('logout') }}" class="nav-link  ">Logout</a></li>
+                <li class="nav-item"><a href="{{ url_for('checkout') }}" class="nav-link  ">Checkout</a></li>
+                {% endif %}
             </ul>
         </header>
     </div>

@@ -1,0 +1,42 @@
+{% include "header.html" %}
+<section class="menu cards">
+    <div class="container px-4 py-5" id="menu-cards">
+        <h2 class="pb-2 border-bottom">Menu</h2>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 py-5">
+            {% for item in menu_items: %}
+            <div class="col">
+                <div class="card-wrapper h-100">
+                    <div class="card h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg d-flex flex-column"
+                         style="height: 420px; background-image: url({{ item.img_url }});
+                      background-size: cover; background-position: center; background-repeat: no-repeat;">
+
+                        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1"
+                             style="background-color: rgba(0, 0, 0, 0.5);">
+                            <div class="flex-grow-1 d-flex flex-column justify-content-end">
+                                <h3 class="mb-4 display-6 lh-1 fw-bold">{{ item.name }}</h3>
+                            </div>
+                            <ul class="d-flex list-unstyled mt-auto justify-content-between align-items-center">
+                                <li>
+                                    <a href="{{ url_for('add_to_cart', item_id = item.id, cafe_id = cafe.id) }}" class="btn btn-primary btn-sm mt-2">
+                                        Add to cart
+                                    </a>
+                                </li>
+                                <li>
+        <span class="fw-bold text-white ms-3" style="font-size: 1.1rem;">
+            £ {{ item.price }}
+        </span>
+                                </li>
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% include "footer.html" %}

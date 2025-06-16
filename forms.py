@@ -1,6 +1,20 @@
 from flask_wtf import FlaskForm
-from wtforms.fields.simple import StringField, SubmitField, BooleanField
+from wtforms.fields.simple import StringField, SubmitField, BooleanField, PasswordField
 from wtforms.validators import DataRequired, URL
+
+#REGISTER - FORM
+class RegisterForm(FlaskForm):
+    name = StringField(label="Name", validators=[DataRequired()])
+    email = StringField(label="Email", validators=[DataRequired()])
+    password = PasswordField(label="Password", validators=[DataRequired()])
+    address = StringField(label="Address", validators=[DataRequired()])
+    register = SubmitField(label="Register")
+
+#LOGIN - FORM
+class LoginForm(FlaskForm):
+    email = StringField(label="Email", validators=[DataRequired()])
+    password = PasswordField(label="Password", validators=[DataRequired()])
+    login = SubmitField(label="Login")
 
 #SEARCH BY LOCATION - FORM
 class SearchForm(FlaskForm):
@@ -25,5 +39,3 @@ class AddForm(FlaskForm):
 class UpdatePriceForm(FlaskForm):
     updated_price = StringField(label="New Price", validators=[DataRequired()])
     submit = SubmitField(label="Update")
-
-
