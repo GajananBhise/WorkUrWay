@@ -3,14 +3,14 @@ import os
 from functools import wraps
 import smtplib
 from dotenv import load_dotenv
-from flask import Flask,render_template, redirect, url_for, flash
+from flask import Flask,render_template, redirect, url_for, flash, abort
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String,Boolean
-from forms import  RegisterForm, LoginForm, SearchForm, AddForm, UpdatePriceForm
+from forms import  RegisterForm, LoginForm, SearchForm, AddForm, UpdatePriceForm, AddMenuItemsToDatabaseForm, AddMenuItemsToCafeForm
 
 #LOAD ENV VARIABLES
 load_dotenv()
@@ -49,7 +49,7 @@ cafe_customer = db.Table("cafe_customer",
                          db.Column("customer_id", db.Integer, db.ForeignKey("customer.id")))
 
 
-#MODEL FOR CAFE TABLE
+
 class Cafes(db.Model):
     __tablename__ = "cafe"
     id : Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -66,7 +66,6 @@ class Cafes(db.Model):
     menu_items = relationship("MenuItems", secondary=cafe_menu, back_populates="cafes")
     customers = relationship("Customers",secondary=cafe_customer, back_populates="cafes")
 
-#MODEL FOR MENUITEMS TABLE
 class MenuItems(db.Model):
     __tablename__ = "menu_item"
     id : Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -76,7 +75,6 @@ class MenuItems(db.Model):
     cafes = relationship("Cafes", secondary=cafe_menu, back_populates="menu_items")
     cart = relationship("Carts",back_populates="original_item" )
 
-#MODEL FOR CUSTOMER TABLE
 class Customers(UserMixin ,db.Model):
     __tablename__ = "customer"
     id : Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -87,7 +85,6 @@ class Customers(UserMixin ,db.Model):
     cafes = relationship("Cafes", secondary=cafe_customer, back_populates="customers")
     cart_items = relationship("Carts", back_populates="customer")
 
-#MODEL FOR CART TABLE
 class Carts(db.Model):
     __tablename__ = "cart"
     item_id : Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -107,6 +104,15 @@ def login_required(f):
         if not current_user.is_authenticated:
             flash("You are not logged in yet! please login")
             return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+#ADMIN ONLY - DECORATED FUNCTION
+def admin_only(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.id != 1:
+            return abort(403)
         return f(*args, **kwargs)
     return decorated_function
 
@@ -241,6 +247,58 @@ def update_price(cafe_id):
 
     return render_template("update_price.html", form = form, current_user = current_user)
 
+@app.route("/add_menu_item_to_database", methods=["GET", "POST"])
+@admin_only
+def add_menu_items_to_database():
+    form = AddMenuItemsToDatabaseForm()
+    if form.validate_on_submit():
+        item_already_exist = db.session.execute(db.select(MenuItems).where(MenuItems.name == form.name.data)).scalar()
+        if item_already_exist:
+            flash("This Menu Item already exist in the Database!")
+        new_item = MenuItems(
+            name = form.name.data,
+            img_url = form.img_url.data,
+            price = int(form.price.data)
+        )
+        db.session.add(new_item)
+        db.session.commit()
+        return redirect(url_for("show_all_cafes"))
+    return render_template("add_menu_item_to_database.html", form = form, current_user = current_user)
+
+#MANAGE MENU ITEMS AT A CAFE
+@app.route("/manage_menu_at_cafe<int:cafe_id>", methods=["GET", "POST"])
+@admin_only
+def manage_menu_at_cafe(cafe_id):
+    current_cafe = db.session.execute(db.select(Cafes).where(Cafes.id == cafe_id)).scalar()
+    form = AddMenuItemsToCafeForm()
+    form.cafe_name.data = current_cafe.name
+
+    menu_items = current_cafe.menu_items
+
+    if form.validate_on_submit():
+        item = db.session.execute(db.select(MenuItems).where(MenuItems.name == form.item_name.data.title())).scalar()
+        if form.item_name.data in[item.name for item in menu_items]:
+            flash("This Menu item is already added to this Cafe!")
+        new_menu_at_cafe = cafe_menu.insert().values(cafe_id = cafe_id, menu_item_id = item.id)
+        db.session.execute(new_menu_at_cafe)
+        db.session.commit()
+        return redirect(url_for("manage_menu_at_cafe", cafe_id = current_cafe.id))
+    return render_template("manage_menu_at_cafe.html", form = form, menu_items = menu_items, cafe=current_cafe, current_user=current_user)
+
+#REMOVE MENU ITEM FROM CAFE
+@app.route("/remove_menuitem_at_cafe/<int:item_id>/<int:cafe_id>")
+@admin_only
+def remove_menu_item_at_cafe(item_id, cafe_id):
+    item_to_delete = cafe_menu.delete().where(
+        cafe_menu.c.cafe_id == cafe_id,
+        cafe_menu.c.menu_item_id == item_id
+    )
+    db.session.execute(item_to_delete)
+    db.session.commit()
+    return redirect(url_for("manage_menu_at_cafe", cafe_id = cafe_id))
+
+
+
 #RENDERS THE MENU ITEM AT THE SELECTED CAFE
 @app.route("/show_menu/<int:cafe_id>")
 def show_menu(cafe_id):
@@ -260,7 +318,6 @@ def add_to_cart(item_id, cafe_id):
     db.session.commit()
     return redirect(url_for("show_menu", cafe_id = cafe_id))
 
-#RENDERS CHECKOUT PAGE - DISPLAYING CUSTOMER DETAILS, CART ITEMS AND TOTAL BILL
 @app.route("/checkout")
 @login_required
 def checkout():
@@ -268,7 +325,6 @@ def checkout():
     total_bill = sum(item.price for item in cart_items)
     return render_template("check_out.html", cart_items = cart_items, current_user = current_user, total_bill = total_bill)
 
-#SEND ORDER CONFIRMATION MAIL TO CUSTOMER AND ORDER DETAILS
 @app.route("/send_order_confirmation")
 @login_required
 def send_order_confirmation():
@@ -287,7 +343,7 @@ def send_order_confirmation():
                                 f"\nyour order has been confirmed & will be delivered soon."
                                 f"\nplease find order detail below:-"
                                 f"{order_details}"
-                                f"\nTotal_bill = {total_bill}"
+                                f"\nTotal_bill = £ {total_bill}"
                                 f"\nBilling Address : {current_user.address}".encode("utf-8"))
         connection.close()
     remove_cart = db.session.execute(db.select(Carts).where(Carts.customer_id == current_user.id)).scalars().all()
@@ -297,5 +353,6 @@ def send_order_confirmation():
     return render_template("confirm_order.html")
 
 
+
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)

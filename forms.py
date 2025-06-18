@@ -39,3 +39,16 @@ class AddForm(FlaskForm):
 class UpdatePriceForm(FlaskForm):
     updated_price = StringField(label="New Price", validators=[DataRequired()])
     submit = SubmitField(label="Update")
+
+#ADD MENU ITEMS TO DATABASE - FORM
+class AddMenuItemsToDatabaseForm(FlaskForm):
+    name = StringField(label="Name", validators=[DataRequired()])
+    img_url = StringField(label="Image URL", validators=[DataRequired(), URL()])
+    price = StringField(label="Price", validators=[DataRequired()])
+    submit = SubmitField(label="Add Item")
+
+#ADD MENU ITEMS TO A CAFE - FORM
+class AddMenuItemsToCafeForm(FlaskForm):
+    cafe_name = StringField(label="Cafe", render_kw={"readonly":True})
+    item_name = StringField(label="Item Name", validators=[DataRequired()])
+    submit = SubmitField(label="Add")

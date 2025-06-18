@@ -30,6 +30,9 @@
                 <li class="nav-item"><a href="{{ url_for('logout') }}" class="nav-link  ">Logout</a></li>
                 <li class="nav-item"><a href="{{ url_for('checkout') }}" class="nav-link  ">Checkout</a></li>
                 {% endif %}
+                {% if current_user.id == 1: %}
+                <li class="nav-item"><a href="{{ url_for('add_menu_items_to_database') }}" class="nav-link  ">Add MenuItem</a></li>
+                {% endif %}
             </ul>
         </header>
     </div>

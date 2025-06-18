@@ -18,11 +18,15 @@
 
     <div class="container px-4 py-5 position-relative" id="icon-grid" style="z-index: 2;">
         <h2 class="pb-2 border-bottom text-white">{{ cafe.name }}</h2>
-
+        {% if current_user.id == 1: %}
+        <a href="{{ url_for('manage_menu_at_cafe', cafe_id = cafe.id) }}" class="btn btn-success btn-sm mt-2">
+            Manage Menu Items
+        </a>
+        {% else: %}
         <a href="{{ url_for('show_menu', cafe_id = cafe.id) }}" class="btn btn-success btn-sm mt-2">
             Make your Order
         </a>
-
+        {% endif %}
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 py-5">
 
 

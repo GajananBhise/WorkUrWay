@@ -14,6 +14,7 @@ and after signup and login users can explore the menu at the cafes, add to cart 
 * Menu items at the cafes.
 * Users can add to cart their items and order online.
 * Users get order confirmation through Email notification.
+* Admin only access to manage menu items at the particular cafe, adding menu items to the database.
 
 ## Technologies Used
 
@@ -70,24 +71,46 @@ and after signup and login users can explore the menu at the cafes, add to cart 
 ## Project Structure
 
 ```
-cafe-order-app/
-├── templates/
-│   ├── index.html
-│   ├── login.html
-│   ├── register.html
-│   ├── show_cafe.html
-│   ├── menu.html
+CafeandWifi/
+│
+├── .env                       # Environment variables
+├── .gitignore                # Git ignore file
+├── Procfile                  # For deployment on Render or Heroku
+├── README.md                 # Project description and documentation
+├── requirements.txt          # List of Python dependencies
+│
+├── main.py                   # Main Flask application
+├── forms.py                  # Flask-WTF form definitions
+│
+├── instance/
+│   └── cafes.db              # SQLite database (local development)
+│
+├── static/
+│   └── images/               # Static image assets
+│       ├── bg.jpg
+│       ├── cafe_logo.jpg
+│       ├── chair.png
+│       ├── chair1.png
+│       ├── location_icon.png
+│       └── sanitary.png
+│
+├── templates/                # HTML templates (Jinja2)
 │   ├── add.html
-│   ├── update_price.html
+│   ├── add_menu_item_to_database.html
+│   ├── cafe_cards.html
 │   ├── check_out.html
 │   ├── confirm_order.html
-│   └── header.html / footer.html
-├── forms.py
-├── app.py
-├── .env
-├── requirements.txt
-└── README.md
-```
+│   ├── footer.html
+│   ├── header.html
+│   ├── index.html
+│   ├── login.html
+│   ├── manage_menu_at_cafe.html
+│   ├── menu.html
+│   ├── register.html
+│   ├── search.html
+│   ├── show_cafe.html
+│   └── update_price.html
+
 
 ## Checkout live website
 https://workurway.onrender.com/
