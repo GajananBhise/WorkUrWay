@@ -11,6 +11,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String,Boolean
 from forms import  RegisterForm, LoginForm, SearchForm, AddForm, UpdatePriceForm, AddMenuItemsToDatabaseForm, AddMenuItemsToCafeForm
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 #LOAD ENV VARIABLES
 load_dotenv()
@@ -333,21 +335,34 @@ def send_order_confirmation():
     order_details = ""
     for item in cart_items:
         order_details += f"\n{item.name} : £ {item.price}"
-    with smtplib.SMTP("smtp.gmail.com") as connection:
-        connection.starttls()
-        connection.login(user = os.environ.get("EMAIL"),
-                         password=os.environ.get("GMAIL_APP_PASSWORD"))
-        connection.sendmail(from_addr=os.environ.get("EMAIL"),
-                            to_addrs=current_user.email,
-                            msg=f"Subject:Order Confirmation!\n\nHello {current_user.name} "
-                                f"\nyour order has been confirmed & will be delivered soon."
-                                f"\nplease find order detail below:-"
-                                f"{order_details}"
-                                f"\nTotal_bill = £ {total_bill}"
-                                f"\nBilling Address : {current_user.address}".encode("utf-8"))
-        connection.close()
-    remove_cart = db.session.execute(db.select(Carts).where(Carts.customer_id == current_user.id)).scalars().all()
-    for item in remove_cart:
+    message = Mail(
+        from_email = os.environ.get("EMAIL"),  # must be verified in SendGrid
+        to_emails=current_user.email,
+        subject='Order Confirmation - Your Meal is on the Way!',
+        html_content=f"""
+        <h3>Hello {current_user.name},</h3>
+        <p>Your order has been confirmed and will be delivered soon.</p>
+        <p><strong>Billing Address:</strong> {current_user.address}</p>
+        <p><strong>Total:</strong> £{total_bill}</p>
+
+        <hr>
+        <p style="font-size: 14px;"><strong>Order Details:</strong><br>{order_details.replace('\n', '<br>')}</p>
+
+        <p style="margin-top: 30px; font-size: 12px; color: #888;">
+          You are receiving this email because you placed an order on our website.<br>
+          If you have any questions, contact us at <a href="#">support@WorkurWay.com</a><br>
+          <br>
+          &copy; 2025 Work ur Way, All rights reserved.
+        </p>
+        """
+    )
+    sg = SendGridAPIClient(os.environ.get("SENDGRID_APIKEY"))
+    response = sg.send(message)
+    print(response.status_code)
+    print(response.body)
+    print(response.headers)
+    clear_cart = db.session.execute(db.select(Carts).where(Carts.customer_id == current_user.id)).scalars().all()
+    for item in clear_cart:
         db.session.delete(item)
     db.session.commit()
     return render_template("confirm_order.html")

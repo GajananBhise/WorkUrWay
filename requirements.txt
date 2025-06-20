@@ -11,3 +11,4 @@ SQLAlchemy==2.0.25
 gunicorn==21.2.0
 python-dotenv
 psycopg2-binary
+sendgrid
