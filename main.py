@@ -335,6 +335,7 @@ def send_order_confirmation():
     order_details = ""
     for item in cart_items:
         order_details += f"\n{item.name} : £ {item.price}"
+    order_details_html = order_details.replace('\n', '<br>')
     message = Mail(
         from_email = os.environ.get("EMAIL"),  # must be verified in SendGrid
         to_emails=current_user.email,
@@ -346,7 +347,7 @@ def send_order_confirmation():
         <p><strong>Total:</strong> £{total_bill}</p>
 
         <hr>
-        <p style="font-size: 14px;"><strong>Order Details:</strong><br>{order_details.replace('\n', '<br>')}</p>
+        <p style="font-size: 14px;"><strong>Order Details:</strong><br>{order_details_html}</p>
 
         <p style="margin-top: 30px; font-size: 12px; color: #888;">
           You are receiving this email because you placed an order on our website.<br>
