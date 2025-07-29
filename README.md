@@ -112,9 +112,6 @@ CafeandWifi/
 │   └── update_price.html
 
 
-## Checkout live website
-https://workurway.onrender.com/
-
 ## Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
